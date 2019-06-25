@@ -1,0 +1,71 @@
+{
+    "registration": {
+        "firstname": "Sheetal",
+        "lastname": "Bedarkar",
+        "email": "sheetalbedarkar7@gmail.com",
+        "password": "Sheetal@123",
+        "cpassword": "Sheetal@123"
+    },
+
+    "isVerified": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOiI1ZDEwYzNhMDI3ZmQxOTQ1MDdmNTUwNjMifSwiaWF0IjoxNTYxMzc5NzQ0LCJleHAiOjE1NjE0NjYxNDR9.qXslRKs0PlMA3GoWz_xfm0hw-IzrIN15_-1_LXbqumM"
+    },
+
+    "login": {
+        "email": "sheetalbedarkar96@gmail.com",
+        "password": "Sheetal@123"
+    },
+
+    "forgetPassword": {
+        "email": "sheetalbedarkar0108@gmail.com"
+    },
+
+    "resetPassword": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOiI1ZDBjN2U3MTUxMjA3NTBkZWQ5MTVkNTIifSwiaWF0IjoxNTYxMzgwODE0LCJleHAiOjE1NjE0NjcyMTR9.leKQShktBFWw58GhS4D2kzb41OyAnpZiLFHSMV1np1U",
+        "password": "Sheetal@123",
+        "cpassword": "Sheetal@123"
+    },
+
+    "createNote": {
+        "userId": "5d10c3a027fd194507f55063",
+        "title": "TestNote",
+        "content": "This note is for testing",
+        "trash": false,
+        "archive": false
+    },
+
+    "getNote": {
+        "_id": "5d10cb42ff1ee44921c92c21"
+    },
+
+    "updateNote": {
+        "_id": "5d10cb42ff1ee44921c92c21",
+        "title": "updated",
+        "content": "updated note"
+    },
+
+    "deleteNote": {
+        "_id": "5d10cd1e8028f049deaae5fa"
+    },
+
+    "archiveNote": {
+        "_id": "5d10cb42ff1ee44921c92c21"
+    },
+
+    "trashNote": {
+        "_id": "5d10cb42ff1ee44921c92c21"
+    },
+    
+    "reminderNote": {
+        "_id": "5d10cb42ff1ee44921c92c21",
+        "reminder": "2019-06-24T07:21:45.337Z"
+    },
+
+    "searchNoteWithTitle": {
+        "title": "Note"
+    },
+    
+    "searchNoteWithDescription": {
+        "content": "note"
+    }
+}
