@@ -1,18 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const dbConfig = require('./config/db.config');
-const mongoose = require('mongoose');
+const db = require('./services/dbServices.js')
 const route = require('./routes/app.routes');
 const notesRouter = require('./routes/notes.routes')
+const labelRouter = require('./routes/labels.routes')
 const expressValidator = require('express-validator');
 
 //directive to load http module and store returned HTTP instance into http variable
 const http = require('http');
 require('dotenv').config();
-
-var redis = require('redis');
-//creates a new client
-var client = redis.createClient();
+const redisService = require("./services/redisService.js")
+// var redis = require('redis');
+// //creates a new client
+// var client = redis.createClient();
 
 // Export app for other routes to use
 const app = express();
@@ -32,36 +32,22 @@ app.use('/', route)
 
 app.use('/', notesRouter);
 
+app.use('/', labelRouter);
+
 var server = app.listen(4000, () =>
 {
     console.log("server is listening to port 4000")
 });
 
-client.on('connect', () =>
-{
-    console.log("Connected to REDIS....")
-})
-
-mongoose.Promise = global.Promise;
+// client.on('connect', () =>
+// {
+//     console.log("Connected to REDIS....")
+// })
 
 // Connecting to the database
-mongoose.connect(dbConfig.url, 
-{
-    useNewUrlParser: true
-}).then(() =>
-{
-    console.log("Successfully connected to the database");
-}).catch(err =>
-    {
-        console.log("Could not connect to the database. Exiting now...", err);
-        process.exit();
-    })
+db.mongoD();
 
-
-    mongoose.set('useNewUrlParser',true)
-    mongoose.set('useFindAndModify',false)
-
-    mongoose.set('useCreateIndex',true);
+redisService.redis();
 
 // define a simple route
 app.get('/', (req, res) =>

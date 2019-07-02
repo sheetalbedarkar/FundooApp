@@ -1,4 +1,8 @@
 var notesService = require("../services/notes.services.js");
+var redis = require('redis');
+//creates a new client
+var client = redis.createClient();
+
 
 module.exports.createNote = (req, res) =>
 {
@@ -7,211 +11,379 @@ module.exports.createNote = (req, res) =>
 
     var errors = req.validationErrors();
     var response = {};
-
-    if(errors)
+    try
     {
-        response.success = false;
-        response.error = errors;
-        return res.status(422).send(response);
-    }
-    else
-    {
-        notesService.createNote(req.body, (err, result) =>
+        if(errors)
         {
-            console.log("--------Create a note in controller-----------");
-            var responseResult = {};
-            if(err)
-            {
-                return res.status(400).send({
-                    message : err
-                })
+            response.success = false;
+            response.message = "Error while creating a note.."
+            response.error = errors;
+            return res.status(422).send(response);
+        }
+        else
+        {
+            var obj = {
+                "userId": req.decoded.payload.user_id,
+                "title": req.body.title,
+                "content": req.body.content
             }
-            else
+            notesService.createNote(obj, (err, result) =>
             {
-                response.success = true;
-                response.result = result;
-                return res.status(200).send(responseResult);
-            }
-        })
+                var responseResult = {};
+                if(err)
+                {
+                    responseResult.success = false;
+                    responseResult.message = "Unable to create a note.."
+                    responseResult.error = err;
+                    return res.status(400).send(responseResult)
+                }
+                else
+                {
+                    responseResult.success = true;
+                    responseResult.message = "Note created successfully..";
+                    responseResult.result = result;
+                    return res.status(200).send(responseResult);
+                }
+            })
+        }
+    }
+    catch(err)
+    {
+        console.log(err);
     }
 }
 
 module.exports.getAllNotes = (req, res) =>
 {
-    notesService.getAllNotes(req.body, (err, result) =>
+    var obj = {
+        "userId": req.decoded.payload.user_id
+    }
+    notesService.getAllNotes(obj, (err, result) =>
     {
-        var response = {}
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message: err
-            })
+            var response = {}
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while displaying all notes..";
+                response.error = err
+                return res.status(400).send(response)
+            }
+            else
+            {
+                response.success = true;
+                response.message = "All notes are displayed.."
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err)
         }
     })
 }
 
 module.exports.getNote = (req, res) =>
 {
-    notesService.getNote(req.body, (err, result) =>
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "_id": req.body._id 
+    }
+    notesService.getNote(obj, (err, result) =>
     {
-        var response = {}
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            var response = {}
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while displaying a note..";
+                response.error = err
+                return res.status(400).send(response);
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Mention Note is :: "
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err)
         }
     })
 }
 
 module.exports.updateNote = (req, res) =>
 {
-    notesService.updateNote(req.body, (err, result) =>
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "_id": req.body._id,
+        "title": req.body.title,
+        "content": req.body.content
+    }
+    notesService.updateNote(obj, (err, result) =>
     {
-        var response = {}
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            var response = {}
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while updating a note..";
+                response.error = err
+                return res.status(400).send(response)
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Note updated successfully.."
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err)
         }
     })
 }
 
 module.exports.deleteNote = (req, res) =>
 {
-    notesService.deleteNote(req.body, (err, result) =>
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "_id": req.body._id
+    }
+    notesService.deleteNote(obj, (err, result) =>
     {
-        var response = {}
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            var response = {}
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while deleting a note..";
+                response.error = err
+                return res.status(400).send(response);
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Note deleted successfully.."
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err);
         }
     })
 }
 
 module.exports.trashNote = (req, res) =>
 {
-    notesService.trashNote(req.body, (err, result) =>
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "_id": req.body._id,
+        "trash" : req.body.trash
+    }
+    notesService.trashNote(obj, (err, result) =>
     {
-        var response = {}
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            var response = {}
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while moving a note to trash..";
+                response.error = err
+                return res.status(400).send(response)
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Note has been moved to trash.."
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err);
         }
     })
 }
 
 module.exports.archiveNote = (req, res) =>
 {
-    notesService.archiveNote(req.body, (err, result) =>
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "_id": req.body._id,
+        "archive" : req.body.archive
+    }
+    notesService.archiveNote(obj, (err, result) =>
     {
-        var response = {}
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            var response = {}
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while archiving a note..";
+                response.error = err
+                return res.status(400).send(response)
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Note archived successfully.."
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err);
         }
     })
 }
 
 module.exports.reminderNote = (req, res) =>
 {
-    notesService.reminderNote(req.body, (err, result) =>
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "_id": req.body._id,
+        "reminder" : req.body.reminder
+    }
+    notesService.reminderNote(obj, (err, result) =>
     {
-        var response = {}
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            var response = {}
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while setting a reminder to note..";
+                response.error = err
+                return res.status(400).send(response);
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Reminder is set to the Note.."
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err);
         }
     })
 }
 
 module.exports.searchNoteWithTitle = (req, res) =>
 {
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "title" : req.body.title
+    }
     var response = {}
-    notesService.searchNoteWithTitle(req.body, (err, result) =>
+    notesService.searchNoteWithTitle(obj, (err, result) =>
     {
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while searching a note..";
+                response.error = err
+                return res.status(400).send(response);
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Searched Notes are :: "
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err)
         }
     })  
 }
 
 module.exports.searchNoteWithDescription = (req, res) =>
 {
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "content" : req.body.content
+    }
     var response = {}
-    notesService.searchNoteWithDescription(req.body, (err, result) =>
+    notesService.searchNoteWithDescription(obj, (err, result) =>
     {
-        if(err)
+        try
         {
-            return res.status(400).send({
-                message : err
-            })
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while searching a note..";
+                response.error = err
+                return res.status(400).send(response);
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Searched Notes are :: "
+                response.result = result;
+                return res.status(200).send(response);
+            }
         }
-        else
+        catch(err)
         {
-            response.success = true;
-            response.result = result;
-            return res.status(200).send(response);
+            console.log(err)
+        }
+    })
+}
+
+module.exports.getNotesWithRedis = (req, res) =>
+{
+    var obj = {
+        "userId": req.decoded.payload.user_id,
+        "_id" : req.body._id,
+        "content" : req.body.content
+    }
+    var response = {}
+    notesService.getNotesWithRedis(obj, (err, result) =>
+    {
+        try
+        {
+            if(err)
+            {
+                response.success = false;
+                response.message = "Error while getting notes from the redis cache.."
+                response.error = err;
+                return res.status(400).send(response);
+            }
+            else
+            {
+                response.success = true;
+                response.message = "Notes are getting from redis cache.."
+                response.result = result;
+                return res.status(200).send(response);
+            }
+        }
+        catch(err)
+        {
+            console.log(err);
         }
     })
 }

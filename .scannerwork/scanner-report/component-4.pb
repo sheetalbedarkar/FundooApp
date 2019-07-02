@@ -1,0 +1,1 @@
+coverage/cobertura-coverage.xml 2xmlXÄ	h

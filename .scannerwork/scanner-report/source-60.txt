@@ -1,0 +1,18 @@
+var redis = require('redis');
+//creates a new client
+var client = redis.createClient();
+module.exports = {
+redis(){
+    client.on('connect', () =>
+    {
+        console.log("Connected to REDIS....")
+    })
+    
+    var reconnectAfter = 15000;
+
+    client.on( 'error', function () {
+      console.log( (new Date()) + " Redis: disconnect");
+      setTimeout( connect, reconnectAfter);
+    });
+}
+}

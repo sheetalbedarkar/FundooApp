@@ -1,87 +1,132 @@
 var userModel = require('../models/app.model.js');
 
-//Register purpose
+/** 
+ * @description : Register purpose
+ */
 exports.register = (req, callback) => 
 {
     userModel.register(req, (err, data) => 
     {
-        if (err) 
+        try
         {
-            return callback(err);
-        } 
-        else 
+            if (err) 
+            {
+                return callback(err);
+            } 
+            else 
+            {
+                console.log("services register");
+                return callback(null, data);
+            }
+        }
+        catch(err)
         {
-            console.log("services register");
-            return callback(null, data);
+            console.log(err);
         }
     })
 }
 
-//Email verification purpose
+/** 
+ * @description : Email verification purpose
+ */
 exports.isVerified = (req, callback) => 
 {
     userModel.isVerified(req, (err, data) => 
     {
-        if (err) 
+        try
         {
-            return callback(err);
-        } 
-        else 
+            if (err) 
+            {
+                return callback(err);
+            } 
+            else 
+            {
+                console.log("services verfication");
+                return callback(null, data);
+            }
+        }
+        catch(err)
         {
-            console.log("services verfication");
-            return callback(null, data);
+            console.log(err);
         }
     })
 }
     
-//Login purpose
+/**
+ * @description : Login purpose
+ */
 exports.login = (req, callback) => 
 {
     userModel.login(req, (err, data) => 
     {
-        if (err) 
+        try
         {
-            return callback(err);
-        } 
-        else 
+            if (err) 
+            {
+                return callback(err);
+            } 
+            else 
+            {
+                console.log("services login");
+                return callback(null, data);
+            }
+        }
+        catch(err)
         {
-            console.log("services login");
-            return callback(null, data);
+            console.log(err);
         }
     })
 }
 
-//forget purpose
+/** 
+ * @description : forget purpose
+ */
 exports.forgetPassword=(data,callback)=>
 {
-    userModel.forgetPassword(data,(err,result)=>{
-        if(err)
+    userModel.forgetPassword(data,(err,result)=>
+    {
+        try
         {
-            callback(err);
+            if(err)
+            {
+                callback(err);
+            }
+            else 
+            {
+                console.log("services forgetPassword")
+                callback(null,result)      
+            }
         }
-        else 
+        catch(err)
         {
-            console.log("services forgetPassword")
-            callback(null,result)
-                
+            console.log(err);
         }
     })
 }
 
-//reset purpose
+/**
+ * @description : reset purpose
+ */
 exports.resetPassword=(req,callback)=>
 {
     console.log("in reset services")
     userModel.resetPassword(req,(err,result)=>
     {
-        if(err)
+        try
         {
-            callback(err);
+            if(err)
+            {
+                callback(err);
+            }
+            else 
+            {
+                console.log("services resetPass")
+                callback(null,result)
+            }
         }
-        else 
+        catch(err)
         {
-            console.log("services resetPass")
-            callback(null,result)
+            console.log(err);
         }
     })
 } 

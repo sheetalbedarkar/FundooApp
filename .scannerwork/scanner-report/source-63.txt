@@ -1,0 +1,151 @@
+const mongoose = require("mongoose");
+var mongoSchema = mongoose.Schema;
+var noteSchema = new mongoSchema(
+    {
+        "userId":
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "userSchema"
+        },
+        "title":
+        {
+             type: String, require : [true, "title is required"]
+        },
+        "content":
+        {
+            type: String
+        },
+        "trash":
+        {
+            type: Boolean
+        },
+        "archive":
+        {
+            type: Boolean
+        },
+        "reminder":
+        {
+            type: Date
+        }
+    },
+    {
+        timestamps: true
+    });
+
+var notes = mongoose.model('notes', noteSchema);
+
+
+class mongoServices
+{
+    constructor(){}
+
+/** 
+ * @description Create and Save a new Note
+ */
+createNote(body, callback) {
+    /**
+     * @description : Create a Note
+     */
+    const newNote = new notes({
+        "userId": body.userId,
+        "title": body.title,
+        "content": body.content,
+        "trash": false,
+        "archive": false,
+    });
+
+    /** 
+     * @description : Save Note in the database
+     */
+    newNote.save((err, result) => {
+        try
+        {
+            if (err) 
+                throw err
+            else 
+            {
+                console.log("New Note created successfully...", result);
+                return callback(null, result)
+            }
+        }
+        catch(err)
+        {
+            console.log(err)
+        }
+    })
+}
+
+/**
+ * @description : Retrieve and return all notes from the database.
+ */
+getAllNotes(req, field, callback) {
+    notes.find(field, (err, result) => {
+        try
+        {
+            if (err) 
+                throw err
+            else 
+            {
+                console.log("All the notes are listed...", result);
+                return callback(null, result);
+            }
+        }
+        catch(err)
+        {
+            console.log(err)
+        }
+    })
+}
+
+/** 
+ * @description : update a single note with a noteId
+ */
+updateNote(req, field, callback){
+    notes.findByIdAndUpdate({ _id: req._id }, field, (err, result) => 
+    {
+        try
+        {
+            if (err) 
+                throw err
+            else 
+            {
+                console.log("Note has been updated...");
+                return callback(null, result);
+            }
+        }
+        catch(err)
+        {
+            console.log(err)
+        }
+        })
+}
+
+/** 
+ * @description : delete a single note with a noteId
+ */
+deleteNote(req, callback)
+{
+    notes.findByIdAndRemove({ _id: req._id }, (err, result) => 
+    {
+        try
+        {
+            if (err) 
+                throw err
+            else 
+            {
+                console.log("Note has been deleted....");
+                return callback(null, result);
+            }
+        }
+        catch(err)
+        {
+            console.log(err)
+        }
+    })
+}
+
+}
+
+/** EXPORTS */
+const notesModel = new mongoServices()
+module.exports = notesModel

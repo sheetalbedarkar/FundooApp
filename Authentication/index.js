@@ -2,13 +2,24 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config();
 
 exports.checkToken = (req, res, next) => {
-    var token1 = req.header('token'); //decode token
-    if (token1) 
+    //var token1 = req.header('token'); //decode token
+    var id = req.body.id
+    
+    client.get(id,(err,reply) => {
+        
+    if (reply) 
     {       
-        //verify secret and checks exp 
-        jwt.verify(token1, process.env.SECRET_KEY, (err, decoded) => 
+        /**
+         * @description : verify token and decode it
+         * @param {string, string, function}
+         * string : token for verification
+         * string : secret key
+         * function : to decode the token
+         */
+        jwt.verify(reply, process.env.SECRET_KEY, (err, decoded) => 
         {
-            
+        try
+        {    
             if (err) 
             {
                 return res.send({
@@ -17,22 +28,32 @@ exports.checkToken = (req, res, next) => {
                 })
             }
 
-            //req decoded and next will pass the controller
+            /**
+             * @description : req decoded and next will pass the controller
+             */
             else
             {
                 req.decoded = decoded;
                  next();
             }
-            });
+        }
+        catch(err)
+        {
+            console.log("ERROR..")
+        }
+    });
     }
     else 
     {       
-        //if there is no token return an error
+        /**
+         * @description : if there is no token return an error
+         */ 
         return res.send(
         {
             sucess: false,
             message: "No token provided"
         })
     }
+})
 }
     

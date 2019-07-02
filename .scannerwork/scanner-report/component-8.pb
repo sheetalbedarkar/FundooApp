@@ -1,0 +1,1 @@
+coverage/lcov-report/sorter.js 2jsX«h

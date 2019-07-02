@@ -1,0 +1,6 @@
+projectKey=FundooApp
+serverUrl=http://localhost:9000
+serverVersion=6.7.1.35068
+dashboardUrl=http://localhost:9000/dashboard/index/FundooApp
+ceTaskId=AWudcBiIs6Mfw2afuU6Q
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AWudcBiIs6Mfw2afuU6Q
