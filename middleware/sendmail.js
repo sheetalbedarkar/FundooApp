@@ -41,7 +41,7 @@ exports.sendEmailFunction = (url,email) => {
         }
         catch(err)
         {
-            console.log(err)
+            return err;
         }
     });
 }

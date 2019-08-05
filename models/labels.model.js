@@ -9,7 +9,13 @@ const labelSchema = new mongoSchema(
         },
         "label" :
         {
-            type : String, require : [true, "label name is required"]
+            type : String, 
+            require : [true, "label name is required"]
+        },
+        "note": 
+        {
+            type : mongoose.Schema.Types.ObjectId,
+            ref  : "noteSchema"
         }
     },
     {
@@ -22,7 +28,9 @@ var labels = mongoose.model('labels', labelSchema);
 class labelModel
 {
     constructor(){}
-
+/** 
+ * @description Create and Save a new label
+ */
 createLabel(body, callback)
 {
     const newLabel = new labels({
@@ -30,6 +38,9 @@ createLabel(body, callback)
         "label" : body.label
     })
 
+        /** 
+         * @description : Save label in the database
+         */
     newLabel.save((err, result) =>
     {
         try
@@ -43,12 +54,15 @@ createLabel(body, callback)
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
 
-getLabel(req, field, callback)
+/**
+ * @description : Retrieve and return labels from the database.
+ */
+getLabel(data, field, callback)
 {
     labels.find(field, (err, result) =>
     {
@@ -63,14 +77,17 @@ getLabel(req, field, callback)
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
 
-updateLabel(req, field, callback)
+/** 
+ * @description : update a label
+ */
+updateLabel(data, field, callback)
 {
-    labels.findByIdAndUpdate({_id : req._id}, field, (err, result) =>
+    labels.findByIdAndUpdate({_id : data._id}, field, (err, result) =>
     {
         try
         {
@@ -83,14 +100,17 @@ updateLabel(req, field, callback)
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
 
-deleteLabel(req, callback)
+/** 
+ * @description : deleting a label
+ */
+deleteLabel(data, callback)
 {
-    labels.findByIdAndRemove({_id : req._id}, (err, result) =>
+    labels.findByIdAndRemove({_id : data._id}, (err, result) =>
     {
         try
         {
@@ -103,7 +123,7 @@ deleteLabel(req, callback)
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }

@@ -1,4 +1,4 @@
-var userModel = require('../models/app.model.js');
+var userModel = require('../models/app.model');
 
 /** 
  * @description : Register purpose
@@ -15,13 +15,12 @@ exports.register = (req, callback) =>
             } 
             else 
             {
-                console.log("services register");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
@@ -41,13 +40,12 @@ exports.isVerified = (req, callback) =>
             } 
             else 
             {
-                console.log("services verfication");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
@@ -67,13 +65,12 @@ exports.login = (req, callback) =>
             } 
             else 
             {
-                console.log("services login");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
@@ -93,13 +90,12 @@ exports.forgetPassword=(data,callback)=>
             }
             else 
             {
-                console.log("services forgetPassword")
                 callback(null,result)      
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
@@ -109,7 +105,6 @@ exports.forgetPassword=(data,callback)=>
  */
 exports.resetPassword=(req,callback)=>
 {
-    console.log("in reset services")
     userModel.resetPassword(req,(err,result)=>
     {
         try
@@ -120,13 +115,12 @@ exports.resetPassword=(req,callback)=>
             }
             else 
             {
-                console.log("services resetPass")
                 callback(null,result)
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 } 

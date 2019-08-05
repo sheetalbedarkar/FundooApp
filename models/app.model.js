@@ -7,11 +7,31 @@ var salt = 10;
  */
 var mongoschema = mongoose.Schema
 var userSchema = new mongoschema({
-    "firstname": { type: String, required: [true, "firstname is required"] },
-    "lastname": { type: String, required: [true, "lastname is required"] },
-    "isVerified": { type: Boolean, default: false },
-    "email": { type: String, required: [true, "email is required"] },
-    "password": { type: String, required: [true, "password is required"] },
+    "firstname": 
+    { 
+        type: String, 
+        required: [true, "firstname is required"] 
+    },
+    "lastname": 
+    { 
+        type: String, 
+        required: [true, "lastname is required"] 
+    },
+    "isVerified": 
+    { 
+        type: Boolean, 
+        default: false 
+    },
+    "email": 
+    { 
+        type: String, 
+        required: [true, "email is required"] 
+    },
+    "password": 
+    { 
+        type: String, 
+        required: [true, "password is required"] 
+    }
 },
     {
         versionKey: '_somethingElse'
@@ -35,7 +55,7 @@ usermodel.prototype.register = (body, callback) => {
             if (err)
                 throw err;
             else if (data.length > 0) {
-                var response = { "error": true, "message": "Email already exists ", "errorCode": 404 };
+                var response = { "err": true, "message": "Email already exists ", "errorCode": 404 };
                 return callback(response);
             }
             else {
@@ -52,14 +72,13 @@ usermodel.prototype.register = (body, callback) => {
                         throw err;
                     else 
                     {
-                        console.log("Register successfully", result);
                         callback(null, result);
                     }
                 })
             }
         }
         catch (err) {
-            console.log("ERROR occured while registering the user..")
+            return callback(err);
         }
     });
 }
@@ -67,8 +86,8 @@ usermodel.prototype.register = (body, callback) => {
 /**
  * @description : API to check the verified user
  */
-usermodel.prototype.isVerified = (req, callback) => {
-    user.updateOne({ _id: req.decoded.payload.user_id }, { $set: { isVerified: true } }, (err, result) => {
+usermodel.prototype.isVerified = (data, callback) => {
+    user.updateOne({ _id: data.decoded.payload.user_id }, { $set: { isVerified: true } }, (err, result) => {
         try {
             if (err)
                 throw err;
@@ -77,7 +96,7 @@ usermodel.prototype.isVerified = (req, callback) => {
             }
         }
         catch (err) {
-            console.log("ERROR while verifying the user..")
+            return callback(err);
         }
     })
 }
@@ -100,31 +119,27 @@ usermodel.prototype.login = (body, callback) => {
                     {
                         if (data[0].isVerified === true) 
                         {
-                            console.log("login successfully......!", data);
                             callback(null, data);
                         }
                         else 
                         {
-                            console.log("user is not verified.. please verify..", data)
-                            return callback("Verify your email..").status(500)
+                            return callback("Verify your email..")
                         }
 
                     }
                     else 
                     {
-                        console.log("incorrect password please check it once ");
-                        return callback("Incorrect password").status(500);
+                        return callback("Incorrect password")
                     }
                 });
             }
             else 
             {
-                console.log("username is not in database please check it.")
                 return callback("Invalid User");
             }
         }
         catch (err) {
-            console.log("ERROR")
+            return callback(err);
         }
     });
 }
@@ -147,7 +162,7 @@ usermodel.prototype.forgetPassword = (data, callback) => {
             }
         }
         catch (err) {
-            console.log("ERROR..")
+            return callback(err);
         }
     })
 }
@@ -155,12 +170,9 @@ usermodel.prototype.forgetPassword = (data, callback) => {
 /**
  * @description : API for reset password
  */
-usermodel.prototype.resetPassword = (req, callback) => {
-    console.log('in model--data:--', req.decoded);
-    console.log('in model--body:--', req.body);
-    let newpassword = bcrypt.hashSync(req.body.password, salt);
-    console.log(('new pass bcrypt--', newpassword));
-    user.updateOne({ _id: req.decoded.payload.user_id }, { $set: { password: newpassword } }, (err, result) => {
+usermodel.prototype.resetPassword = (data, callback) => {
+    let newpassword = bcrypt.hashSync(data.body.password, salt);
+    user.updateOne({ _id: data.decoded.payload.user_id }, { $set: { password: newpassword } }, (err, result) => {
         try {
             if (err)
                 throw err;
@@ -169,7 +181,7 @@ usermodel.prototype.resetPassword = (req, callback) => {
             }
         }
         catch (err) {
-            console.log("ERROR..")
+            return callback(err);
         }
     })
 }

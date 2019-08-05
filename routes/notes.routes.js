@@ -1,4 +1,4 @@
-const contNotes = require("../controllers/notes.controller.js");
+const contNotes = require("../controllers/notes.controller");
 const auth = require('../Authentication/index')
 const express = require("express");
 const notesRouter = express.Router();
@@ -10,22 +10,22 @@ notesRouter.post("/createNote",auth.checkToken, contNotes.createNote);
 notesRouter.get("/getAllNotes",auth.checkToken, contNotes.getAllNotes);
 
 // Retrieve a single Note with noteId
-notesRouter.get("/getNote",auth.checkToken, contNotes.getNote);
+notesRouter.get("/getNote/:noteId",auth.checkToken, contNotes.getNote);
 
 // Update a Note with noteId
-notesRouter.put("/updateNote",auth.checkToken, contNotes.updateNote);
+notesRouter.put("/updateNote/:noteId",auth.checkToken, contNotes.updateNote);
 
 // Delete a Note with noteId
-notesRouter.delete("/deleteNote",auth.checkToken, contNotes.deleteNote);
+notesRouter.put("/deleteNote/:noteId",auth.checkToken, contNotes.deleteNote);
 
 // Trash a note with noteId
-notesRouter.post("/trashNote",auth.checkToken, contNotes.trashNote);
+notesRouter.post("/trashNote/:noteId",auth.checkToken, contNotes.trashNote);
 
 // Archive a note with noteId
-notesRouter.post("/archiveNote",auth.checkToken, contNotes.archiveNote);
+notesRouter.post("/archiveNote/:noteId",auth.checkToken, contNotes.archiveNote);
 
 // Set reminder to a note
-notesRouter.post("/reminderNote",auth.checkToken, contNotes.reminderNote);
+notesRouter.post("/reminderNote/:noteId",auth.checkToken, contNotes.reminderNote);
 
 // Search a Note with title
 notesRouter.get("/searchNoteWithTitle",auth.checkToken, contNotes.searchNoteWithTitle)
@@ -34,7 +34,22 @@ notesRouter.get("/searchNoteWithTitle",auth.checkToken, contNotes.searchNoteWith
 notesRouter.get("/searchNoteWithDescription",auth.checkToken, contNotes.searchNoteWithDescription)
 
 // get all notes content from redis cache
-notesRouter.get("/getNotesWithRedis",auth.checkToken, contNotes.getNotesWithRedis)
+notesRouter.get("/getNotes",auth.checkToken, contNotes.getNotes)
 
+notesRouter.get("/getAllTrashNotes", auth.checkToken,contNotes.getAllTrashNotes)
+
+notesRouter.get("/getAllArchiveNotes", auth.checkToken, contNotes.getAllArchiveNotes)
+
+notesRouter.put("/addLabel", auth.checkToken, contNotes.addLabel)
+
+notesRouter.put("/removeLabel", auth.checkToken, contNotes.removeLabel)
+
+notesRouter.put("/setColor", auth.checkToken, contNotes.setColor)
+
+notesRouter.get("/getNoteLabels", auth.checkToken, contNotes.getNoteLabels)
+
+notesRouter.put("/deleteReminder", auth.checkToken, contNotes.deleteReminder);
+
+notesRouter.get("/getAllRemainderNotes", auth.checkToken, contNotes.getAllRemainderNotes);
 //export router to use in our server.js
 module.exports = notesRouter;

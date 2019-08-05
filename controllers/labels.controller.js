@@ -1,17 +1,22 @@
-var labelService = require("../services/labels.service.js");
+var labelService = require("../services/labels.service");
 
+/**
+ * @description : controller for creating a label
+ */
 module.exports.createLabel =  (req, res) =>
 {
+    let response = {
+        success: false,
+        message: "Error while creating a label..",
+        data: {}
+    }
+
     req.checkBody("label" , "Invalid").isLength({ min : 3 });
 
     let errors = req.validationErrors();
-    let response = {};
-
     if(errors)
     {
-        response.success = false;
-        response.message = "Unble to create label.."
-        response.error = errors;
+        response.message = errors
         return res.status(422).send(response);
     }
     else
@@ -24,30 +29,30 @@ module.exports.createLabel =  (req, res) =>
         {
             try
             {
-                let responseResult = {}
                 if(err)
                 {
-                    responseResult.success = false;
-                    responseResult.message = "Error while creating a label..";
-                    responseResult.error = err;
-                    return res.status(400).send(responseResult);
+                    response.message = err
+                    return res.status(400).send(response);
                 }
                 else
                 {
-                    responseResult.success = true;
-                    responseResult.message = "Label created successfully..";
-                    responseResult.result = result;
-                    return res.status(200).send(responseResult);
+                    response.success = true;
+                    response.message = "Label created successfully..";
+                    response.data = result;
+                    return res.status(200).send(response);
                 }
             }
             catch(err)
             {
-                console.log(err);
+                return err;
             }
         })
     }
 }
 
+/**
+ * @description : controller for displaying all labels
+ */
 module.exports.getLabel = (req, res) =>
 {
     var obj = {
@@ -57,12 +62,14 @@ module.exports.getLabel = (req, res) =>
     {
         try
         {
-            let response = {}
+            let response = {
+                success : false,
+                message : "Error while displaying the labels",
+                data : {}
+            }
             if(err)
             {
-                response.success = false;
-                response.message = "Error while displaying the labels"
-                response.error = err;
+                response.message = err;
                 return res.status(400).send(response);
             }
             else
@@ -75,11 +82,14 @@ module.exports.getLabel = (req, res) =>
         }
         catch(err)
         {
-            console.log(err)
+            return err;
         }
     })
 }
 
+/**
+ * @description : controller for displaying a single label
+ */
 module.exports.getLabelById = (req, res) =>
 {
     var obj = {
@@ -90,12 +100,14 @@ module.exports.getLabelById = (req, res) =>
     {
         try
         {
-            let response = {}
+            let response = {
+                success : false,
+                message : "Error while displaying a label..",
+                data : {}
+            }
             if(err)
             {
-                response.success = false;
-                response.message = "Error while displaying a label.."
-                response.error = err
+                response.message = err
                 return res.status(400).send(response);
             }
             else
@@ -108,11 +120,14 @@ module.exports.getLabelById = (req, res) =>
         }
         catch(err)
         {
-            console.log(err);
+            return err;
         }
     })
 }
 
+/**
+ * @description : controller for updating a label
+ */
 module.exports.updateLabel = (req, res) =>
 {
     var obj = {
@@ -124,12 +139,14 @@ module.exports.updateLabel = (req, res) =>
     {
         try
         {
-            let response = {}
+            let response = {
+                success : false,
+                message : "Error while updating a label...",
+                data : {}
+            }
             if(err)
             {
-                response.success = false;
-                response.message = "Error while updating a label..."
-                response.error = err;
+                response.message = err;
                 return res.status(400).send(response);
             }
             else
@@ -140,29 +157,34 @@ module.exports.updateLabel = (req, res) =>
                 return res.status(200).send(response);
             }
         }
-        catch
+        catch(err)
         {
-            console.log(err);
+            return err;
         }
     })
 }
 
+/**
+ * @description : controller for deleting a label
+ */
 module.exports.deleteLabel = (req, res) =>
 {
     var obj = {
         "userId": req.decoded.payload.user_id,
         "_id": req.body._id
     }
-    labelService.deleteLabel(req.body, (err, result) =>
+    labelService.deleteLabel(obj, (err, result) =>
     {
         try
         {
-            let response = {}
+            let response = {
+                success : false,
+                message : "Error while deleting a label..",
+                data : {}
+            }
             if(err)
             {
-                response.success = false;
-                response.message = "Error while deleting a label.."
-                response.error = err;
+                response.message = err;
                 return res.status(400).send(response);
             }
             else
@@ -175,7 +197,43 @@ module.exports.deleteLabel = (req, res) =>
         }
         catch(err)
         {
-            console.log(err);
+            return err;
         }
     })
 }
+
+// module.exports.getNoteLabels = (req, res) =>
+// {
+//     var obj = {
+//         "userId": req.decoded.payload.user_id,
+//         "note" : req.body.note,
+//         "label" : req.body.label
+//     }
+//     labelService.getNoteLabels(obj, (err, result) =>
+//     {
+//         try
+//         {
+//             var response = {
+//                 success : false,
+//                 message : "Error while getting labels of note..",
+//                 data : {}
+//             }
+//             if(err)
+//             {
+//                 response.message = err
+//                 return res.status(400).send(response)
+//             }
+//             else
+//             {
+//                 response.success = true;
+//                 response.message = "all labels of notes are displayed.."
+//                 response.result = result;
+//                 return res.status(200).send(response);
+//             }
+//         }
+//         catch(err)
+//         {
+//             return err;
+//         }
+//     })
+// }

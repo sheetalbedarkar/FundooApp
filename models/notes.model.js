@@ -9,23 +9,37 @@ var noteSchema = new mongoSchema(
         },
         "title":
         {
-             type: String, require : [true, "title is required"]
+            type: String, 
+            min : [4, "Too small title"],
+            max : [20, "Too big title"],
+            require : [true, "title is required"]
         },
         "content":
         {
             type: String
         },
-        "trash":
+        "isTrash":
         {
-            type: Boolean
+            type: Boolean,
+            default : false
         },
-        "archive":
+        "isArchive":
         {
-            type: Boolean
+            type: Boolean,
+            default : false
         },
         "reminder":
         {
             type: Date
+        },
+        "color":
+        {
+            type : String
+        },
+        "label": 
+        {
+            type : mongoose.Schema.Types.ObjectId,
+            ref  : "labelSchema"
         }
     },
     {
@@ -48,50 +62,50 @@ createNote(body, callback) {
     const newNote = new notes({
         "userId": body.userId,
         "title": body.title,
-        "content": body.content,
-        "trash": false,
-        "archive": false,
+        "content": body.content
     });
-
-    /** 
-     * @description : Save Note in the database
-     */
-    newNote.save((err, result) => {
-        try
-        {
+    try
+    {
+        /** 
+         * @description : Save Note in the database
+         */
+        newNote.save((err, result) => {
+       
             if (err) 
                 throw err
             else 
             {
-                console.log("New Note created successfully...", result);
                 return callback(null, result)
             }
-        }
-        catch(err)
-        {
-            console.log(err)
-        }
-    })
+        })
+    }
+    catch(err)
+    {
+        return callback(err);
+    }
 }
 
 /**
  * @description : Retrieve and return all notes from the database.
  */
-getAllNotes(req, field, callback) {
+getAllNotes(data, field, callback) {
+    console.log("model",data,field);    
     notes.find(field, (err, result) => {
         try
         {
-            if (err) 
+            if (err) {
+            console.log("err",err)
                 return callback(err);
+            }
             else 
             {
-                console.log("All the notes are listed...", result);
+                console.log("res model",result)
                 return callback(null, result);
             }
         }
         catch(err)
         {
-            console.log(err)
+            return callback(err);
         }
     })
 }
@@ -99,8 +113,9 @@ getAllNotes(req, field, callback) {
 /** 
  * @description : update a single note with a noteId
  */
-updateNote(req, field, callback){
-    notes.findByIdAndUpdate({ _id: req._id }, field, (err, result) => 
+updateNote(data, field, callback)
+{
+    notes.findByIdAndUpdate({ _id: data._id }, field, (err, result) => 
     {
         try
         {
@@ -108,23 +123,23 @@ updateNote(req, field, callback){
                 throw err
             else 
             {
-                console.log("Note has been updated...");
                 return callback(null, result);
             }
         }
         catch(err)
         {
-            console.log(err)
+            return callback(err);
         }
-        })
+    })
 }
 
 /** 
  * @description : delete a single note with a noteId
  */
-deleteNote(req, callback)
+deleteNote(data, callback)
 {
-    notes.findByIdAndRemove({ _id: req._id }, (err, result) => 
+    console.log("DATA :::::",data)
+    notes.findByIdAndRemove({ _id: data._id }, (err, result) => 
     {
         try
         {
@@ -132,13 +147,12 @@ deleteNote(req, callback)
                 throw err
             else 
             {
-                console.log("Note has been deleted....");
                 return callback(null, result);
             }
         }
         catch(err)
         {
-            console.log(err)
+            return callback(err);
         }
     })
 }

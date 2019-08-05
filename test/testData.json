@@ -30,8 +30,8 @@
         "userId": "5d10c3a027fd194507f55063",
         "title": "TestNote",
         "content": "This note is for testing",
-        "trash": false,
-        "archive": false
+        "isTrash": false,
+        "isArchive": false
     },
 
     "getNote": {

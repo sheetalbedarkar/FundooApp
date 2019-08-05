@@ -1,5 +1,4 @@
-var notesModel = require("../models/notes.model.js");
-
+var notesModel = require("../models/notes.model");
 
 class userService
 {
@@ -8,9 +7,9 @@ class userService
 /**
  * @description : service for creating a note
  */
-createNote(req, callback)
+createNote(data, callback)
 {
-    notesModel.createNote(req, (err, data) =>
+    notesModel.createNote(data, (err, data) =>
     {
         try
         {
@@ -20,13 +19,12 @@ createNote(req, callback)
             }
             else
             {
-                console.log("---------Service Create a Note-----------")
                 callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err)
+            return callback(err);
         }
     })
 }
@@ -34,10 +32,10 @@ createNote(req, callback)
 /**
  * @description : service for get all notes
  */
-getAllNotes(req,callback)
+getAllNotes(data,callback)
 {
-    let field = {}
-    notesModel.getAllNotes(req, field, (err, data) =>
+    let field = {isTrash : false, isArchive : false}
+    notesModel.getAllNotes(data, field, (err, data) =>
     {
         try
         {
@@ -47,13 +45,12 @@ getAllNotes(req,callback)
             }
             else
             {
-                console.log("---------Service Display all Notes-----------")
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err)
+            return callback(err);
         }
     })
 }
@@ -61,10 +58,10 @@ getAllNotes(req,callback)
 /**
  * @description : service for get a note with noteId
  */
-getNote(req, callback)
+getNote(data, callback)
 {
-    let field = { _id: req._id }
-    notesModel.getAllNotes(req, field, (err, data) =>
+    let field = { _id: data._id }
+    notesModel.getAllNotes(data, field, (err, data) =>
     {
         try
         {
@@ -74,13 +71,12 @@ getNote(req, callback)
             }
             else
             {
-                console.log("---------Service Displaying a Note-----------");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
@@ -88,9 +84,16 @@ getNote(req, callback)
 /**
  * @description : service for update a note with noteId
  */
-updateNote(req, callback)
+updateNote(data, callback)
 {
-    notesModel.updateNote(req, (err,data) =>
+    var id = {
+      _id :  data._id
+    }
+    var field = {
+        title : data.title,
+        content : data.content
+    }
+    notesModel.updateNote(id,field, (err,data) =>
     {
         try
         {
@@ -100,13 +103,12 @@ updateNote(req, callback)
             }
             else
             {
-                console.log("---------Service upadating a Note-----------");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err)
+            return callback(err);
         }
     })
 }
@@ -114,9 +116,9 @@ updateNote(req, callback)
 /**
  * @description : service for delete a note with noteId
  */
-deleteNote(req, callback)
+deleteNote(data, callback)
 {
-    notesModel.deleteNote(req, (err, data) =>
+    notesModel.deleteNote(data, (err, data) =>
     {
         try
         {
@@ -126,13 +128,12 @@ deleteNote(req, callback)
             }
             else
             {
-                console.log("---------Service deleting a Note-----------")
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
@@ -140,53 +141,89 @@ deleteNote(req, callback)
 /**
  * @description : service for trash a note with noteId
  */
-trashNote(req, callback)
+trashNote(data, callback)
 {
-    let field = {trash : true }
-    notesModel.updateNote(req, field, (err, data) =>
+    let field1 = { _id: data._id }
+    notesModel.getAllNotes(data, field1, (err, data1) =>
     {
-        try
+        if(err)
         {
-            if(err)
-            {
-                return callback(err);
-            }
-            else
-            {
-                console.log("---------Service moving a Note to trash-----------");
-                return callback(null, data);
-            }
+            return callback(err);
         }
-        catch(err)
-        {
-            console.log(err)
+        else
+        {   
+            var field
+            if(data1[0].isTrash === false)
+            {
+                field = { isTrash: true }
+                console.log("if ",data1.isTrash);
+                
+            }
+            else if(data1[0].isTrash === true)
+            {
+                field = { isTrash: false }
+                console.log("else ",data1.isTrash);
+            }      
+          console.log("data",data1,field)
+            notesModel.updateNote(data, field, (err, data) => {
+                if (err) {
+                    return callback(err);
+                }
+                else 
+                {
+                    return callback(null, data);
+                }
+            })
         }
     })
 }
+    
 
 /**
  * @description : service for archive a note with noteId
  */
-archiveNote(req, callback)
+archiveNote(data, callback)
 {
-    let field = {archive : true }
-    notesModel.updateNote(req, field, (err, data) =>
+
+    let field1 = { _id: data._id }
+    notesModel.getAllNotes(data, field1, (err, data1) =>
     {
-        try
+        if(err)
         {
-            if(err)
-            {
-                return callback(err);
-            }
-            else
-            {
-                console.log("---------Service moving a Note to archive-----------");
-                return callback(null, data);
-            }
+            return callback(err);
         }
-        catch(err)
-        {
-            console.log(err);
+        else
+        {   
+        console.log("data service",data)
+            var field
+            if(data1[0].isArchive === false)
+            {
+                field = { isArchive: true }
+            }
+            else if(data1[0].isArchive === true)
+            {
+                field = { isArchive: false }
+            }      
+            console.log("service arcchive note :::",data,field)
+            // let field = { isArchive : !(data.isArchive) }
+            notesModel.updateNote(data, field, (err, data) =>
+            {
+                try
+                {
+                    if(err)
+                    {
+                        return callback(err);
+                    }
+                    else
+                    {
+                        return callback(null, data);
+                    }
+                }
+                catch(err)
+                {
+                    return callback(err);
+                }
+            })
         }
     })
 }
@@ -194,10 +231,10 @@ archiveNote(req, callback)
 /**
  * @description : service to set reminder to a note
  */
-reminderNote(req, callback)
+reminderNote(data, callback)
 {
-    let field = { reminder : req.reminder }
-    notesModel.updateNote(req, field, (err, data) =>
+    let field = { reminder : data.reminder }
+    notesModel.updateNote(data, field, (err, data) =>
     {
         try
         {
@@ -207,13 +244,12 @@ reminderNote(req, callback)
             }
             else
             {
-                console.log("---------Service set reminder to a note-----------");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err)
+            return callback(err);
         }
     })
 }
@@ -221,10 +257,10 @@ reminderNote(req, callback)
 /**
  * @description : service for search a note with title
  */
-searchNoteWithTitle(req, callback)
+searchNoteWithTitle(data, callback)
 {
-    let field = { title:{$regex  : req.title}}
-    notesModel.getAllNotes(req, field, (err, data) =>
+    let field = { title:{$regex  : data.title}}
+    notesModel.getAllNotes(data, field, (err, data) =>
     {
         try
         {
@@ -234,13 +270,12 @@ searchNoteWithTitle(req, callback)
             }
             else
             {
-                console.log("---------Service to search a note with title-----------");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
@@ -248,10 +283,10 @@ searchNoteWithTitle(req, callback)
 /**
  * @description : service for get a note with description
  */
-searchNoteWithDescription(req, callback)
+searchNoteWithDescription(data, callback)
 {
-    let field = { content:{$regex  : req.content}}
-    notesModel.getAllNotes(req, field, (err, data) =>
+    let field = { content:{$regex  : data.content}}
+    notesModel.getAllNotes(data, field, (err, data) =>
     {
         try
         {
@@ -261,21 +296,20 @@ searchNoteWithDescription(req, callback)
             }
             else
             {
-                console.log("---------Service to search a note with description-----------");
                 return callback(null, data);
             }
         }
         catch(err)
         {
-            console.log(err);
+            return callback(err);
         }
     })
 }
 
-getNotesWithRedis(req, callback)
+getNotes(data, callback)
 {
     let field = {}
-    notesModel.getAllNotes(req, field, (err, data) =>
+    notesModel.getAllNotes(data, field, (err, data) =>
     {
         if(err)
         {
@@ -283,21 +317,215 @@ getNotesWithRedis(req, callback)
         }
         else
         {
-           client.set(data[0]._id.toString(), data[0].content)
-                 client.get(data[0]._id.toString(), (err, reply) =>
-                 {
-                     if(err)
-                     {
-                         return callback(err)
-                     }
-                     else
-                     {
-                         console.log("REPLY ::::",reply);
-                         console.log("data.id :::::",data[0]._id)
-                        return callback()
-                     }
-                 })
-                            
+           client.set(data[0]._id.toString(), data[0].content, redis.print)
+           client.keys("*", (err,reply) =>
+           {
+               if(err)
+               {
+                   console.log(err)
+                   //return callback(err)
+               }
+               else
+               {
+                   console.log(reply)
+                
+               }
+               return callback(null, reply)
+           }) 
+        }
+    })
+}
+
+/**
+ * @description : service for get all trash notes
+ */
+getAllTrashNotes(data,callback)
+{
+    let field = {isTrash : true }
+    notesModel.getAllNotes(data, field, (err, data) =>
+    {
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
+        }
+    })
+}
+
+/**
+ * @description : service for get all archive notes
+ */
+getAllArchiveNotes(data,callback)
+{
+    let field = {isArchive : true }
+    notesModel.getAllNotes(data, field, (err, data) =>
+    {
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
+        }
+    })
+}
+
+addLabel(data, callback)
+{
+    let field = { $push : {label : data.label}}
+    console.log("field",field)
+    notesModel.updateNote(data, field, (err, data) =>
+    {
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
+        }
+    })
+}
+
+removeLabel(data, callback)
+{
+    let field = { $pull : {label : data.label}}
+    notesModel.updateNote(data, field, (err, data) =>
+    {
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
+        }
+    })
+}
+
+setColor(data, callback)
+{
+    let field = { $set : {color : data.color}}
+    notesModel.updateNote(data, field, (err, data) =>
+    {
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
+        }
+    })
+}
+
+getNoteLabels(data, callback)
+{
+    let field = { label : { $match : data.label[0] } }
+    console.log("field1",field)
+    notesModel.getAllNotes(data, field, (err, data) =>
+    {
+        console.log("data",data)
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                console.log("data service",data)
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
+        }
+    })
+}
+
+deleteReminder(data, callback)
+{
+    let field = { $unset : { reminder : data.reminder }}
+    notesModel.updateNote(data, field, (err, data) =>
+    {
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
+        }
+    })
+}
+
+getAllRemainderNotes(data,callback)
+{
+    let field = { reminder: { $exists: true } } 
+    notesModel.getAllNotes(data, field, (err, data) =>
+    {
+        try
+        {
+            if(err)
+            {
+                return callback(err);
+            }
+            else
+            {
+                return callback(null, data);
+            }
+        }
+        catch(err)
+        {
+            return callback(err);
         }
     })
 }

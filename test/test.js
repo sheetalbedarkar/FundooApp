@@ -2,7 +2,7 @@ var chai = require('chai')
 var chaiHttp = require('chai-http')
 chai.use(chaiHttp);
 chai.should()
-var server = require('../server.js');
+var server = require('../server');
 /**
  * @description : Reading JSON
  */

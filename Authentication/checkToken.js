@@ -2,12 +2,9 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config();
 
 exports.checkToken = (req, res, next) => {
-    //var token1 = req.header('token'); //decode token
-    var token = req.header('token');
-    
-    client.get(token,(err,reply) => {
-        
-    if (reply) 
+    var token1 = req.header('token'); //decode token
+    //var id = req.body.id    
+    if (token1) 
     {       
         /**
          * @description : verify token and decode it
@@ -16,7 +13,7 @@ exports.checkToken = (req, res, next) => {
          * string : secret key
          * function : to decode the token
          */
-        jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => 
+        jwt.verify(token1, process.env.SECRET_KEY, (err, decoded) => 
         {
         try
         {    
@@ -54,6 +51,5 @@ exports.checkToken = (req, res, next) => {
             message: "No token provided"
         })
     }
-})
 }
     

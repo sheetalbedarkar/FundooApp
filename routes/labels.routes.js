@@ -1,4 +1,4 @@
-const contLabels = require('../controllers/labels.controller.js');
+const contLabels = require('../controllers/labels.controller');
 const auth = require('../Authentication/index')
 const express = require('express');
 const labelsRouter = express.Router();
@@ -10,13 +10,15 @@ labelsRouter.post("/createLabel",auth.checkToken, contLabels.createLabel);
 labelsRouter.get("/getLabel",auth.checkToken, contLabels.getLabel);
 
 // Retrieve a single label with noteId
-labelsRouter.get("/getLabelById",auth.checkToken, contLabels.getLabelById);
+labelsRouter.get("/getLabelById/:labelId",auth.checkToken, contLabels.getLabelById);
 
 // Update a label with labelId
-labelsRouter.put("/updateLabel",auth.checkToken, contLabels.updateLabel);
+labelsRouter.put("/updateLabel/:labelId",auth.checkToken, contLabels.updateLabel);
 
 // Delete a label with labelId
-labelsRouter.delete("/deleteLabel",auth.checkToken, contLabels.deleteLabel);
+labelsRouter.put("/deleteLabel/:labelId",auth.checkToken, contLabels.deleteLabel);
+
+// labelsRouter.get("/getNoteLabels", auth.checkToken, contLabels.getNoteLabels)
 
 //export router to use in our server.js
 module.exports = labelsRouter;

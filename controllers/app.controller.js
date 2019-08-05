@@ -1,76 +1,83 @@
-var userService = require('../services/services.js');
+var userService = require('../services/services');
 var gentoken = require('../middleware/token');
 var sendmail = require('../middleware/sendmail');
 var upload = require("../services/awsService")
-// var redis = require('redis');
-// //creates a new client
-// var client = redis.createClient();
 
+/**
+ * @description : controller for registeration of the user
+ */
 module.exports.register = (req, res) => {
-    //Validating the data using express-validator
+    /**
+     * @description : Validating the data using express-validator
+     */
     req.checkBody('firstname', 'firstname is not valid').isLength({ min: 3 }).isAlpha();
     req.checkBody('lastname', 'lastname is not valid').isLength({ min: 3 }).isAlpha();
     req.checkBody('email', 'Email is not valid').isEmail();
     req.checkBody('password', 'password is not valid').isLength({ min: 8 }).equals(req.body.cpassword);
     var errors = req.validationErrors();
-    var response = {};
+    var response = {
+        success : false,
+        message : "Error while registration of the user..",
+        data : {}
+    };
     try {
         if (errors) {
-            response.success = false;
-            response.message = "Error while registration of the user.."
-            response.error = errors;
+            response.message = errors;
             return res.status(422).send(response);
         }
         else {
             userService.register(req.body, (err, result) => {
-                try {
-                    var responseResult = {};
-                    if (err) {
-                        response.success = false;
-                        response.message = "Unable to register the user.."
-                        response.error = err;
-                        return res.status(500).send(response)
-                    }
-                    else {
-                        responseResult.success = true;
-                        responseResult.message = "Registered successfully.."
-                        responseResult.result = result;
-                        const payload = {
-                            user_id: responseResult.result._id
-                        }
-                        console.log(payload);
-                        //Generate token
-                        const obj = gentoken.GenerateToken(payload);
-                        console.log("controller obj", obj);
-                        const url = `http://localhost:4000/#!/isVerified/${obj.token}`;
-                        //send mail
-                        sendmail.sendEmailFunction(url, req.body.email);
-                        res.status(200).send(url);
-                    }
+                if (err) {
+                    response.message = err;
+                    return res.status(404).send(response)
                 }
-                catch (err) {
-                    console.log(err)
+                else {
+                    console.log("register")
+                    response.success = true;
+                    response.message = "Registered successfully.."
+                    response.result = result;
+            
+                    const payload = {
+                        user_id: response.result._id
+                    }
+                    /**
+                     * @description : Generate token
+                     */
+                    console.log("success")
+                    const obj = gentoken.GenerateToken(payload);
+
+                    const url = `http://localhost:4200/user/isVerified/${obj.token}`;
+                    /**
+                     * @description : send mail
+                     */
+                    sendmail.sendEmailFunction(url, req.body.email);
+                    console.log("token sent")
+                    res.status(200).send(response);
                 }
             })
         }
     }
-    catch (errors) {
-        console.log(errors)
+    catch (err) {
+        return err;
     }
 }
 
+/**
+ * @description : controller to check verification of the user
+ */
 exports.isVerified = (req, res) => {
-    var responseResult = {};
+    var responseResult = {
+        success : false,
+        message : "Unable to verify the user..",
+        data : {}
+    };
     userService.isVerified(req, (err, result) => {
         try {
             if (err) {
-                responseResult.success = false;
-                responseResult.message = "Unable to verify the user.."
-                responseResult.error = err;
-                res.status(500).send(responseResult)
+                responseResult.message = err;
+                res.status(404).send(responseResult)
             }
             else {
-                console.log('in user ctrl token is verified giving response');
                 responseResult.success = true;
                 responseResult.message = "User verified successfully.."
                 responseResult.result = result;
@@ -78,21 +85,28 @@ exports.isVerified = (req, res) => {
             }
         }
         catch (err) {
-            console.log(err)
+            return err;
         }
     })
 }
 
+/**
+ * @description : controller to login the user
+ */
 module.exports.login = (req, res) => {
-    //Validating the data using express-validator
+    /**
+     * @description : Validating the data using express-validator
+     */
     req.checkBody('email', 'Email is not valid').isEmail();
     req.checkBody('password', 'password is not valid').isLength({ min: 4 });
     var errors = req.validationErrors();
-    var response = {};
+    var response = {
+        success : false,
+        message : "Unable to login.. Please check your email id and password..",
+        data : {}
+    };
     if (errors) {
-        response.success = false;
-        response.message = "Unable to login.. Please check your email id and password.."
-        response.error = errors;
+        response.message = errors;
         return res.status(422).send(response);
     }
     else {
@@ -100,31 +114,36 @@ module.exports.login = (req, res) => {
             try {
                 if (err) 
                 {
-                    response.success = false;
-                    response.message = "Unable to login.."
-                    response.error = err;
-                    return res.status(500).send(response);
+                    response.message = error.err;
+                    return res.status(404).send(response);
                 }
                 else 
                 {
                     response.success = true;
                     response.message = "Login successfully.."
                     response.data = data;
-                    res.status(200).send(response);
-                    console.log(data);
+                    
+ 
                     const payload = 
                     {
                         user_id: data[0]._id
                     }
-
-                    //Generate token
+                    /**s
+                     * @description : Generate token
+                     */
                     const obj = gentoken.GenerateToken(payload);
                     
-                    //set token to redis cache
-                    client.set(data[0]._id, obj.token)
-                    
-                    //get token to redis cache
-                    client.get(data[0]._id, (err, reply) => 
+                    /**
+                     * @description : set token to redis cache
+                     */
+                    client.set(obj.token, obj.token)
+                    response.token=obj.token
+                    res.status(200).send(response);
+
+                    /**
+                     * @description : get token to redis cache
+                     */
+                    client.get(obj.token, (err, reply) => 
                     {
                         try {
                             if (err) throw err
@@ -135,66 +154,82 @@ module.exports.login = (req, res) => {
                         }
                         catch (err) 
                         {
-                            console.log(err);
+                            return err;
                         }
                     })
                 }
             }
             catch (err) 
             {
-                console.log(err)
+                return err;
             }
         });
     }
 
 };
 
+/**
+ * @description : controller to forget the password
+ */
 exports.forgetPassword = (req, res) => {
-    var responseResult = {};
+    var responseResult = {
+        success : false,
+        message : "Please enter registered email id..",
+        data : {}
+    };
     userService.forgetPassword(req.body, (err, result) => {
         try {
             if (err) {
-                responseResult.success = false;
-                responseResult.message = "Please enter registered email id.."
-                responseResult.error = err;
-                res.status(500).send(responseResult)
+                responseResult.message = err;
+                res.status(404).send(responseResult)
             }
-            else {
+            else 
+            {
                 responseResult.success = true;
                 responseResult.message = "Reset password link has been sent to your registered mail id."
                 responseResult.result = result;
                 const payload = {
                     user_id: responseResult.result._id
                 }
-                console.log(payload);
-
-                //Generate token
+                /**
+                 * @description : Generate token
+                 */
                 const obj = gentoken.GenerateToken(payload);
-                console.log("controller obj", obj);
-                const url = `http://localhost:4000/#!/resetPassword/${obj.token}`;
 
-                //Send Mail
+                const url = `http://localhost:4200/user/resetPassword/${obj.token}`;
+
+                /**
+                 * @description : Send Mail
+                 */
                 sendmail.sendEmailFunction(url, req.body.email);
 
-                //Send email using this token generated
-                res.status(200).send(url);
+                /**
+                 * @description : Send email using this token generated
+                 */
+                res.status(200).send(responseResult);
             }
         }
         catch (err) {
-            console.log(err);
+            return err;
         }
     })
 }
 
+/**
+ * @description : controller to reset the password of the user
+ */
 exports.resetPassword = (req, res) => {
-    var responseResult = {};
+    var responseResult = {
+        success : false,
+        message : "Unable to reset your password..",
+        data : {}
+    };
     userService.resetPassword(req, (err, result) => {
         try {
             if (err) {
-                responseResult.success = false;
-                responseResult.message = "Unable to reset your password.."
-                responseResult.error = err;
-                res.status(500).send(responseResult)
+                
+                responseResult.message = err;
+                res.status(404).send(responseResult)
             }
             else {
                 responseResult.success = true;
@@ -204,23 +239,28 @@ exports.resetPassword = (req, res) => {
             }
         }
         catch (err) {
-            console.log(err);
+            return err;
         }
     })
 }
 
+/**
+ * @description : controller for uploading the image in s3-bucket
+ */
 exports.upload = (req, res) => {
     var fileUpload = upload.single('image')
 
-    var responseResult = {};
+    var responseResult = {
+        success : false,
+        message : "Error while uploading the image..",
+        data : {}
+    };
     fileUpload(req, res, (err, result) => {
         try {
             //handle error
             if (err) {
-                responseResult.success = false;
-                responseResult.message = "Error while uploading the image.."
-                responseResult.error = err;
-                res.status(500).send(responseResult)
+                responseResult.message = err;
+                res.status(404).send(responseResult)
             }
             //success
             else {
@@ -231,7 +271,7 @@ exports.upload = (req, res) => {
             }
         }
         catch (err) {
-            console.log(err)
+            return err;
         }
     })
 }

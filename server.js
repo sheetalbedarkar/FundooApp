@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./services/dbServices.js')
+const db = require('./services/dbServices')
+const cors = require('cors')
 const route = require('./routes/app.routes');
 const notesRouter = require('./routes/notes.routes')
 const labelRouter = require('./routes/labels.routes')
@@ -10,9 +11,6 @@ const expressValidator = require('express-validator');
 const http = require('http');
 require('dotenv').config();
 const redisService = require("./services/redisService.js")
-// var redis = require('redis');
-// //creates a new client
-// var client = redis.createClient();
 
 // Export app for other routes to use
 const app = express();
@@ -26,23 +24,20 @@ app.use(bodyParser.urlencoded({extended : false}))
 // parse requests of content-type - application/json
 app.use(bodyParser.json())
 
-app.use(express.static('../Client'));
+app.use(cors())
 
-app.use('/', route)
+app.use(express.static('../client'));
 
-app.use('/', notesRouter);
+app.use('/user', route)
 
-app.use('/', labelRouter);
+app.use('/note', notesRouter);
+
+app.use('/label', labelRouter);
 
 var server = app.listen(4000, () =>
 {
     console.log("server is listening to port 4000")
 });
-
-// client.on('connect', () =>
-// {
-//     console.log("Connected to REDIS....")
-// })
 
 // Connecting to the database
 db.mongoD();
@@ -50,8 +45,8 @@ db.mongoD();
 redisService.redis();
 
 // define a simple route
-app.get('/', (req, res) =>
-{
-    res.json({"message" : "WELCOME to fundoo notes"})
-});
+// app.get('/', (req, res) =>
+// {
+//     res.json({"message" : "WELCOME to fundoo notes"})
+// });
 module.exports = app;
