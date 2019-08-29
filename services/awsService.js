@@ -5,14 +5,8 @@ var multerS3 = require('multer-s3')
 require('dotenv').config();
 var app = express()
 
-const config = {
-  accessKey : process.env.accessKey,
-  secretAccessKey : process.env.secretAccessKey,
-  awsRegion : process.env.awsRegion
-}
-
 //configuring the AWS environment
-var s3 = new aws.S3(config)
+var s3 = new aws.S3()
  
 //configuring parameters 
 var upload = multer({

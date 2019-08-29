@@ -36,11 +36,11 @@ var noteSchema = new mongoSchema(
         {
             type : String
         },
-        "label": 
+        "label": [
         {
             type : mongoose.Schema.Types.ObjectId,
             ref  : "labelSchema"
-        }
+        }]
     },
     {
         timestamps: true
@@ -63,7 +63,7 @@ createNote(body, callback) {
         "userId": body.userId,
         "title": body.title,
         "content": body.content
-    });
+       });
     try
     {
         /** 
@@ -88,18 +88,16 @@ createNote(body, callback) {
 /**
  * @description : Retrieve and return all notes from the database.
  */
-getAllNotes(data, field, callback) {
-    console.log("model",data,field);    
+getAllNotes(data, field, callback) {   
     notes.find(field, (err, result) => {
         try
         {
             if (err) {
-            console.log("err",err)
                 return callback(err);
             }
             else 
             {
-                console.log("res model",result)
+                console.log("result model",result)
                 return callback(null, result);
             }
         }
@@ -138,7 +136,6 @@ updateNote(data, field, callback)
  */
 deleteNote(data, callback)
 {
-    console.log("DATA :::::",data)
     notes.findByIdAndRemove({ _id: data._id }, (err, result) => 
     {
         try

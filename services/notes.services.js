@@ -45,6 +45,7 @@ getAllNotes(data,callback)
             }
             else
             {
+                console.log("note services",data)
                 return callback(null, data);
             }
         }
@@ -152,19 +153,16 @@ trashNote(data, callback)
         }
         else
         {   
+            console.log("fzsfgxsg",data1)
             var field
             if(data1[0].isTrash === false)
             {
                 field = { isTrash: true }
-                console.log("if ",data1.isTrash);
-                
             }
             else if(data1[0].isTrash === true)
             {
                 field = { isTrash: false }
-                console.log("else ",data1.isTrash);
             }      
-          console.log("data",data1,field)
             notesModel.updateNote(data, field, (err, data) => {
                 if (err) {
                     return callback(err);
@@ -194,7 +192,6 @@ archiveNote(data, callback)
         }
         else
         {   
-        console.log("data service",data)
             var field
             if(data1[0].isArchive === false)
             {
@@ -204,8 +201,7 @@ archiveNote(data, callback)
             {
                 field = { isArchive: false }
             }      
-            console.log("service arcchive note :::",data,field)
-            // let field = { isArchive : !(data.isArchive) }
+
             notesModel.updateNote(data, field, (err, data) =>
             {
                 try
@@ -323,7 +319,6 @@ getNotes(data, callback)
                if(err)
                {
                    console.log(err)
-                   //return callback(err)
                }
                else
                {
@@ -391,7 +386,6 @@ getAllArchiveNotes(data,callback)
 addLabel(data, callback)
 {
     let field = { $push : {label : data.label}}
-    console.log("field",field)
     notesModel.updateNote(data, field, (err, data) =>
     {
         try
@@ -461,10 +455,8 @@ setColor(data, callback)
 getNoteLabels(data, callback)
 {
     let field = { label : { $match : data.label[0] } }
-    console.log("field1",field)
     notesModel.getAllNotes(data, field, (err, data) =>
     {
-        console.log("data",data)
         try
         {
             if(err)
@@ -473,7 +465,6 @@ getNoteLabels(data, callback)
             }
             else
             {
-                console.log("data service",data)
                 return callback(null, data);
             }
         }

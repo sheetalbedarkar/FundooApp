@@ -65,6 +65,7 @@ exports.login = (req, callback) =>
             } 
             else 
             {
+                console.log("data services",data)
                 return callback(null, data);
             }
         }

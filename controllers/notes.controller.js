@@ -78,6 +78,8 @@ module.exports.getAllNotes = (req, res) =>
                 response.success = true;
                 response.message = "All notes are displayed.."
                 response.result = result;
+                console.log("response",response);
+                console.log("result",result)
                 return res.status(200).send(response);
             }
         }
@@ -93,8 +95,6 @@ module.exports.getAllNotes = (req, res) =>
  */
 module.exports.getNote = (req, res) =>
 {
-    console.log("get note body is",req.body);
-    
     var obj = {
         "userId": req.decoded.payload.user_id,
         "_id": req.body.id 
@@ -139,7 +139,7 @@ module.exports.updateNote = (req, res) =>
         "title": req.body.title,
         "content": req.body.content
     }
-    console.log('obj',obj)
+
     notesService.updateNote(obj, (err, result) =>
     {
         try
@@ -251,7 +251,6 @@ module.exports.trashNote = (req, res) =>
  */
 module.exports.archiveNote = (req, res) =>
 {
-    console.log("controller arcchive note :::")
     var obj = {
         "userId": req.decoded.payload.user_id,
         "_id": req.body.id,

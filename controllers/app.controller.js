@@ -32,7 +32,6 @@ module.exports.register = (req, res) => {
                     return res.status(404).send(response)
                 }
                 else {
-                    console.log("register")
                     response.success = true;
                     response.message = "Registered successfully.."
                     response.result = result;
@@ -43,7 +42,6 @@ module.exports.register = (req, res) => {
                     /**
                      * @description : Generate token
                      */
-                    console.log("success")
                     const obj = gentoken.GenerateToken(payload);
 
                     const url = `http://localhost:4200/user/isVerified/${obj.token}`;
@@ -51,7 +49,6 @@ module.exports.register = (req, res) => {
                      * @description : send mail
                      */
                     sendmail.sendEmailFunction(url, req.body.email);
-                    console.log("token sent")
                     res.status(200).send(response);
                 }
             })
@@ -114,7 +111,7 @@ module.exports.login = (req, res) => {
             try {
                 if (err) 
                 {
-                    response.message = error.err;
+                    response.message = err;
                     return res.status(404).send(response);
                 }
                 else 
@@ -123,16 +120,16 @@ module.exports.login = (req, res) => {
                     response.message = "Login successfully.."
                     response.data = data;
                     
- 
                     const payload = 
                     {
                         user_id: data[0]._id
                     }
-                    /**s
+
+                    /**
                      * @description : Generate token
                      */
                     const obj = gentoken.GenerateToken(payload);
-                    
+
                     /**
                      * @description : set token to redis cache
                      */
