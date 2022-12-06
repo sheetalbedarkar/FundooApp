@@ -21,7 +21,7 @@
     "nodemailer": "^6.2.1",
     "nodemailer-smtp-transport": "^2.7.4",
     "redis": "^2.8.0",
-    "swagger-node-express": "~2.0",
+    "swagger-node-express": "~2.1",
     "swagger-ui-express": "^4.0.7",
     "time-stamp": "^2.2.0",
     "timestamp": "0.0.1",
